@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en" class="dark h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ryland Grace | Astrobiologist & Mission Portfolio</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            gold: {
+              DEFAULT: '#C5B358',
+              light: '#E6D27A',
+              dark: '#9A8B3C',
+              glow: 'rgba(197, 179, 88, 0.4)'
+            },
+            space: {
+              900: '#06080D',
+              800: '#0B0F19',
+              700: '#141C2E',
+              600: '#1F2B45',
+            },
+            eridian: {
+              DEFAULT: '#00E5FF',
+              glow: 'rgba(0, 229, 255, 0.4)'
+            }
+          },
+          fontFamily: {
+            orbitron: ['Orbitron', 'sans-serif'],
+            inter: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #06080D;
+      color: #E2E8F0;
+      overflow-x: hidden;
+    }
+
+    .font-orbitron {
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    /* Custom Glassmorphism */
+    .glass-panel {
+      background: rgba(11, 15, 25, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(197, 179, 88, 0.2);
+    }
+
+    .glass-panel-interactive {
+      background: rgba(11, 15, 25, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(197, 179, 88, 0.2);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-panel-interactive:hover {
+      border-color: rgba(197, 179, 88, 0.6);
+      box-shadow: 0 0 20px rgba(197, 179, 88, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .gold-glow {
+      text-shadow: 0 0 10px rgba(197, 179, 88, 0.5);
+    }
+
+    .gold-border-glow {
+      box-shadow: 0 0 15px rgba(197, 179, 88, 0.25);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #06080D;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1F2B45;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #C5B358;
+    }
+
+    /* Canvas overlay gradient */
+    .canvas-container {
+      position: relative;
+    }
+    .canvas-container::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 0 40px rgba(6, 8, 13, 0.8);
+    }
+
+    /* Prevent text selection while dragging the star map */
+    .star-map-canvas {
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+  </style>
+</head>
+<body class="bg-space-900 text-slate-200 min-h-screen flex flex-col selection:bg-gold selection:text-space-900">
+
+  <!-- Navigation Header -->
+  <header class="fixed top-0 left-0 right-0 z-40 glass-panel border-b border-gold/20 px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-full border border-gold/50 flex items-center justify-center bg-gold/10 text-gold font-orbitron font-bold text-lg">
+          PHM
+        </div>
+        <div>
+          <h1 class="font-orbitron font-bold text-slate-100 tracking-wider text-sm md:text-base">DR. RYLAND GRACE</h1>
+          <p class="text-xs text-gold/80 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            PROJECT HAIL MARY • CHIEF SCIENTIST
+          </p>
+        </div>
+      </div>
+
+      <!-- Nav Links -->
+      <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
+        <a href="#about" class="hover:text-gold transition-colors">Astrobiology Log</a>
+        <a href="#starmap-section" class="hover:text-gold transition-colors flex items-center gap-1.5">
+          <i class="fa-solid fa-diagram-project text-xs text-gold mr-1"></i>Star Map
+        </a>
+        <a href="#astrophage" class="hover:text-gold transition-colors">Astrophage Research</a>
+        <a href="#eridian" class="hover:text-gold transition-colors">Eridian Comms</a>
+      </nav>
+
+      <!-- Action Button -->
+      <div class="flex items-center space-x-3">
+        <button onclick="toggleStarMapModal()" class="px-4 py-2 rounded-lg bg-gold/10 hover:bg-gold/20 border border-gold/40 text-gold font-orbitron text-xs tracking-wider transition-all duration-300 flex items-center space-x-2">
+          <i class="fa-solid fa-expand text-gold"></i>
+          <span class="hidden sm:inline">FULLSCREEN MAP</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="about" class="pt-28 pb-16 px-4 lg:px-8 relative overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gold/10 via-space-900/50 to-space-900 pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+      <div class="lg:col-span-7 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/10 border border-gold/30 text-gold text-xs font-orbitron">
+          <i class="fa-solid fa-rocket"></i> MISSION STATUS: SUCCESSFUL ADVANCE
+        </div>
+
+        <h2 class="text-3xl md:text-5xl font-orbitron font-extrabold text-white leading-tight">
+          SAVING TWO WORLDS THROUGH <span class="text-gold gold-glow">SCIENCE & COOPERATION</span>
+        </h2>
+
+        <p class="text-slate-300 text-sm md:text-base leading-relaxed">
+          Former junior high science teacher turned lone survivor of the Hail Mary interstellar mission. Specialist in non-DNA molecular biology, alien biochemistry, and intercultural communication with the Eridian species.
+        </p>
+
+        <div class="grid grid-cols-3 gap-4 pt-4 border-t border-slate-800">
+          <div>
+            <div class="text-xl md:text-2xl font-orbitron font-bold text-gold">11.9 ly</div>
+            <div class="text-xs text-slate-400">Distance to 40 Eridani</div>
+          </div>
+          <div>
+            <div class="text-xl md:text-2xl font-orbitron font-bold text-eridian">Rocky</div>
+            <div class="text-xs text-slate-400">Eridian Engineer Partner</div>
+          </div>
+          <div>
+            <div class="text-xl md:text-2xl font-orbitron font-bold text-emerald-400">Taumoeba</div>
+            <div class="text-xs text-slate-400">Astrophage Predator</div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-4 pt-2">
+          <a href="#starmap-section" class="px-6 py-3 rounded-lg bg-gold text-space-900 font-orbitron font-bold text-xs tracking-wider hover:bg-gold-light transition-all flex items-center gap-2">
+            <i class="fa-solid fa-compass"></i> EXPLORE STAR MAP
+          </a>
+          <a href="#astrophage" class="px-6 py-3 rounded-lg glass-panel hover:bg-space-800 text-slate-200 font-orbitron text-xs tracking-wider transition-all flex items-center gap-2">
+            <i class="fa-solid fa-microscope text-gold"></i> BIOLOGICAL DATA
+          </a>
+        </div>
+      </div>
+
+      <div class="lg:col-span-5">
+        <div class="glass-panel p-6 rounded-2xl relative">
+          <div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-gold/20 border border-gold flex items-center justify-center text-gold">
+            <i class="fa-solid fa-dna text-xs"></i>
+          </div>
+          <h3 class="font-orbitron font-bold text-lg text-white mb-4 border-b border-slate-800 pb-2 flex items-center gap-2">
+            <i class="fa-solid fa-clipboard-check text-gold"></i> Mission Briefing
+          </h3>
+          <ul class="space-y-3 text-xs md:text-sm text-slate-300">
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-angle-right text-gold mt-1"></i>
+              <span><strong>Objective:</strong> Neutralize Astrophage solar-dimming crisis threatening Sol system.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-angle-right text-gold mt-1"></i>
+              <span><strong>Vessel:</strong> Hail Mary (Spin-gravity centrifuge, Spin-Drive engine utilizing Astrophage reaction).</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-angle-right text-gold mt-1"></i>
+              <span><strong>First Contact:</strong> Alliance established with Eridian vessel <em>Blip-A</em> commanded by Rocky.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-angle-right text-gold mt-1"></i>
+              <span><strong>Key Discovery:</strong> Taumoeba evolved resistance mechanism deployed to both 40 Eridani and Sol.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dedicated Embedded Star Map Section -->
+  <section id="starmap-section" class="py-12 px-4 lg:px-8 border-y border-gold/20 bg-space-800/50">
+    <div class="max-w-7xl mx-auto space-y-6">
+
+      <!-- Section Header -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div class="text-xs font-orbitron text-gold tracking-widest uppercase mb-1">Interactive Navigation Systems</div>
+          <h2 class="text-2xl md:text-3xl font-orbitron font-bold text-white flex items-center gap-3">
+            <i class="fa-solid fa-globe text-gold"></i> SECTOR STAR MAP & TRAJECTORIES
+          </h2>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="resetMapCamera()" class="px-3 py-1.5 rounded glass-panel hover:bg-space-700 text-xs font-orbitron text-slate-300 transition-colors">
+            <i class="fa-solid fa-rotate-left mr-1"></i> Reset View
+          </button>
+          <button onclick="toggleTrajectories()" class="px-3 py-1.5 rounded glass-panel hover:bg-space-700 text-xs font-orbitron text-gold transition-colors">
+            <i class="fa-solid fa-route mr-1"></i> Toggle Routes
+          </button>
+          <button onclick="toggleStarMapModal()" class="px-3 py-1.5 rounded bg-gold/20 border border-gold/50 text-gold text-xs font-orbitron hover:bg-gold/30 transition-colors">
+            <i class="fa-solid fa-maximize mr-1"></i> Fullscreen Modal
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Interactive Canvas Container -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- Canvas Viewer Card -->
+        <div class="lg:col-span-8 glass-panel rounded-2xl p-4 relative overflow-hidden">
+          <div class="canvas-container relative rounded-xl overflow-hidden bg-space-900 border border-slate-800 h-[480px]">
+            <!-- Interactive Canvas -->
+            <canvas id="inlineStarMapCanvas" class="star-map-canvas w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+
+            <!-- Map HUD Overlays -->
+            <div class="absolute top-3 left-3 bg-space-900/80 backdrop-blur border border-gold/30 rounded-lg p-2.5 text-xs space-y-1 font-mono pointer-events-none">
+              <div class="text-gold font-orbitron font-bold text-[10px] tracking-wider">NAVIGATION HUD</div>
+              <div class="text-slate-300">GRID: ERIDIAN-SOL LOG-4</div>
+              <div class="text-slate-400">TARGET: <span id="hudTargetText" class="text-slate-100">Sol &lt;-&gt; 40 Eridani</span></div>
+            </div>
+
+            <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end pointer-events-none gap-2">
+              <div class="bg-space-900/80 backdrop-blur border border-slate-700 rounded-lg p-2 text-[11px] text-slate-400 font-mono">
+                Click star to inspect • Drag to pan • Scroll to zoom • Arrows to orbit • +/− zoom
+              </div>
+              <div class="bg-space-900/80 backdrop-blur border border-gold/30 rounded-lg px-2.5 py-1 text-xs text-gold font-orbitron whitespace-nowrap">
+                SECTOR: LOCAL BUBBLE
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Details Side Panel -->
+        <div class="lg:col-span-4 space-y-4">
+          <div id="starDetailPanel" class="glass-panel p-5 rounded-2xl space-y-4 border-l-4 border-l-[#C5B358]">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-orbitron text-gold tracking-wider">SYSTEM ANALYSIS</span>
+              <span id="starTypeBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-gold/10 text-gold border border-gold/30">Class G V</span>
+            </div>
+
+            <div>
+              <h3 id="starName" class="text-xl font-orbitron font-bold text-white">Sol System</h3>
+              <p id="starSubtitle" class="text-xs text-slate-400 font-mono mt-0.5">Home System of Earth & Human Species</p>
+            </div>
+
+            <p id="starDescription" class="text-xs text-slate-300 leading-relaxed">
+              Target of severe solar output reduction caused by Petrova line Astrophage infection. Earth launched Hail Mary to synthesize extinction prevention response.
+            </p>
+
+            <div class="grid grid-cols-2 gap-2 text-xs font-mono pt-2 border-t border-slate-800">
+              <div class="bg-space-900/60 p-2 rounded">
+                <div class="text-slate-500 text-[10px]">DISTANCE</div>
+                <div id="starDistance" class="text-slate-200 font-bold">0.0 Light Years</div>
+              </div>
+              <div class="bg-space-900/60 p-2 rounded">
+                <div class="text-slate-500 text-[10px]">ASTROPHAGE STATUS</div>
+                <div id="starAstrophage" class="text-emerald-400 font-bold">CLEARED</div>
+              </div>
+            </div>
+
+            <div class="pt-2">
+              <button id="focusStarBtn" onclick="focusSelectedStar()" class="w-full py-2 rounded bg-gold/10 hover:bg-gold/20 border border-gold/40 text-gold text-xs font-orbitron tracking-wider transition-colors">
+                CENTER CAMERA ON SYSTEM
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Select Preset Systems -->
+          <div class="glass-panel p-4 rounded-2xl space-y-3">
+            <div class="text-xs font-orbitron text-slate-300 font-semibold flex items-center justify-between">
+              <span>FEATURED LOCATIONS</span>
+              <i class="fa-solid fa-location-crosshairs text-gold"></i>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button onclick="selectStarByName('Sol')" class="p-2 rounded bg-space-900/80 hover:border-gold/50 border border-slate-800 text-left text-slate-200 font-orbitron transition-all">
+                <div class="text-gold font-bold">Sol System</div>
+                <div class="text-[10px] text-slate-400">Earth Origin</div>
+              </button>
+              <button onclick="selectStarByName('40 Eridani')" class="p-2 rounded bg-space-900/80 hover:border-eridian/50 border border-slate-800 text-left text-slate-200 font-orbitron transition-all">
+                <div class="text-eridian font-bold">40 Eridani</div>
+                <div class="text-[10px] text-slate-400">Eridian Home</div>
+              </button>
+              <button onclick="selectStarByName('Tau Ceti')" class="p-2 rounded bg-space-900/80 hover:border-gold/50 border border-slate-800 text-left text-slate-200 font-orbitron transition-all">
+                <div class="text-slate-100 font-bold">Tau Ceti</div>
+                <div class="text-[10px] text-slate-400">Immune System</div>
+              </button>
+              <button onclick="selectStarByName('Epsilon Eridani')" class="p-2 rounded bg-space-900/80 hover:border-gold/50 border border-slate-800 text-left text-slate-200 font-orbitron transition-all">
+                <div class="text-slate-100 font-bold">Epsilon Eridani</div>
+                <div class="text-[10px] text-slate-400">Infested Sector</div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Astrophage Research Section -->
+  <section id="astrophage" class="py-16 px-4 lg:px-8 max-w-7xl mx-auto space-y-8">
+    <div class="border-l-4 border-gold pl-4">
+      <div class="text-xs font-orbitron text-gold tracking-widest uppercase">Alien Biochemistry & Physics</div>
+      <h2 class="text-2xl md:text-4xl font-orbitron font-bold text-white mt-1">ASTROPHAGE & TAUMOEBA STUDIES</h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Card 1 -->
+      <div class="glass-panel-interactive p-6 rounded-2xl space-y-3">
+        <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
+          <i class="fa-solid fa-sun text-lg"></i>
+        </div>
+        <h3 class="font-orbitron font-bold text-lg text-white">Astrophage Biology</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Single-celled organism capable of storing massive energy in mass-energy equivalence. Emits light on Petrova frequency (96.415 nm) to navigate towards star radiation sources.
+        </p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="glass-panel-interactive p-6 rounded-2xl space-y-3">
+        <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+          <i class="fa-solid fa-bug text-lg"></i>
+        </div>
+        <h3 class="font-orbitron font-bold text-lg text-white">Taumoeba Predation</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Natural predator of Astrophage native to Tau Ceti atmosphere. Breakthrough breeding rendered Taumoeba capable of surviving Xenon atmospheres for Earth release.
+        </p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="glass-panel-interactive p-6 rounded-2xl space-y-3">
+        <div class="w-10 h-10 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center text-gold">
+          <i class="fa-solid fa-fire-flame-curved text-lg"></i>
+        </div>
+        <h3 class="font-orbitron font-bold text-lg text-white">Spin-Drive Physics</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Astrophage powered propulsion system delivering relativistic speeds near 0.92c. Generates immense thrust through controlled mass-to-photon conversion.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Eridian Comms Section -->
+  <section id="eridian" class="py-16 px-4 lg:px-8 border-t border-slate-800 bg-space-800/30">
+    <div class="max-w-7xl mx-auto space-y-8">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div>
+          <div class="text-xs font-orbitron text-eridian tracking-widest uppercase">First Contact Protocols</div>
+          <h2 class="text-2xl md:text-4xl font-orbitron font-bold text-white mt-1">ERIDIAN LINGUISTICS & ROCKY</h2>
+        </div>
+        <div class="px-3 py-1.5 rounded-full bg-eridian/10 border border-eridian/30 text-eridian text-xs font-orbitron">
+          ACOUSTIC DIALECT • CHORDS & PITCH
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-7 glass-panel p-6 rounded-2xl space-y-4">
+          <h3 class="text-lg font-orbitron font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-music text-eridian"></i> Harmony Translation System
+          </h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Eridians communicate via simultaneous musical chords without sight-based language. Using custom software aboard Hail Mary, we compiled a real-time dictionary converting chord frequencies to English syntax.
+          </p>
+          <div class="bg-space-900/80 p-4 rounded-xl border border-slate-800 font-mono text-xs space-y-2">
+            <div class="text-eridian">[Eridian Chord: 440Hz + 880Hz + 1320Hz]</div>
+            <div class="text-slate-300">&gt; Translation: "Amaze! You work with me to save homeworlds."</div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 glass-panel p-6 rounded-2xl space-y-4 border-l-2 border-eridian">
+          <h3 class="text-lg font-orbitron font-bold text-white">Eridian Physiology</h3>
+          <ul class="text-xs space-y-2.5 text-slate-300">
+            <li class="flex items-center gap-2"><i class="fa-solid fa-shield text-eridian"></i> Pentagonal symmetry with 5 legs and heavy carapace</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-temperature-high text-eridian"></i> High-pressure Xenon atmosphere (29 atmospheres, 210°C)</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-eye-slash text-eridian"></i> Echolocation sensory perception (Blind to visual spectrum)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fullscreen Modal Star Map Toggle -->
+  <div id="starMapModal" class="fixed inset-0 z-50 bg-space-900/95 backdrop-blur-xl hidden flex-col" role="dialog" aria-modal="true" aria-labelledby="starMapModalTitle">
+    <!-- Modal Header bar -->
+    <div class="p-4 border-b border-gold/20 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <i class="fa-solid fa-diagram-project text-gold text-xl"></i>
+        <div>
+          <h3 id="starMapModalTitle" class="font-orbitron font-bold text-white text-base">PROJECT HAIL MARY • FULLSCREEN STAR MAP</h3>
+          <p class="text-xs text-slate-400">Interactive Stellar Trajectories & Sector Data</p>
+        </div>
+      </div>
+      <button onclick="toggleStarMapModal()" aria-label="Close star map" class="w-9 h-9 rounded-full bg-space-800 hover:bg-gold/20 border border-gold/40 text-gold flex items-center justify-center transition-colors">
+        <i class="fa-solid fa-xmark text-base"></i>
+      </button>
+    </div>
+
+    <!-- Modal Main Canvas Container -->
+    <div class="flex-1 relative overflow-hidden p-4">
+      <canvas id="modalStarMapCanvas" class="star-map-canvas w-full h-full rounded-xl border border-slate-800 cursor-grab active:cursor-grabbing"></canvas>
+
+      <!-- Floating HUD panel -->
+      <div class="absolute bottom-8 left-8 glass-panel p-4 rounded-xl max-w-sm space-y-2 pointer-events-auto border-gold/40">
+        <div class="text-xs font-orbitron text-gold font-bold">MODAL NAVIGATION ACTIVE</div>
+        <div class="text-xs text-slate-300">
+          Drag to orbit. Scroll to zoom. Arrow keys nudge the camera. Press Escape to close.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="py-8 px-4 border-t border-slate-800 text-center text-xs text-slate-500 font-mono">
+    <div class="max-w-7xl mx-auto space-y-2">
+      <p>PROJECT HAIL MARY • MISSION CONTROL ARCHIVE • DR. RYLAND GRACE</p>
+      <p class="text-slate-600">Built for space exploration & Astrobiology research representation</p>
+    </div>
+  </footer>
+
+  <!-- Interactive Star Map Script Logic -->
+  <script>
+    /* ===================================================
+       STAR MAP DATA & ENGINE STATE
+       =================================================== */
+    const STAR_DATA = [
+      { id: 'sol', name: 'Sol', x: 0, y: 0, z: 0, color: '#FFD700', radius: 9, class: 'Class G2V', subtitle: 'Earth Homeworld', dist: '0.0 ly', astrophage: 'CLEARED', desc: 'Home system of humanity. Petrova line Astrophage infection neutralized via Taumoeba deployment.' },
+      { id: 'eridani', name: '40 Eridani', x: -80, y: 45, z: 20, color: '#00E5FF', radius: 8, class: 'Class K1V', subtitle: 'Eridian Homeworld (Rocky)', dist: '11.9 ly', astrophage: 'CLEARED', desc: 'Triple star system home to the Eridian civilization. Primary mission partner in saving both biospheres.' },
+      { id: 'tau_ceti', name: 'Tau Ceti', x: 60, y: -50, z: -30, color: '#A0E0FF', radius: 7.5, class: 'Class G8V', subtitle: 'Taumoeba Origin', dist: '11.9 ly', astrophage: 'NATURAL IMMUNITY', desc: 'Target star showing no solar dimming. Source of Taumoeba species capable of preying on Astrophage.' },
+      { id: 'epsilon_eridani', name: 'Epsilon Eridani', x: -40, y: -70, z: 40, color: '#FFB347', radius: 6.5, class: 'Class K2V', subtitle: 'Neighboring Infected System', dist: '10.5 ly', astrophage: 'INFESTED', desc: 'Neighboring star experiencing severe Petrova dimming due to Astrophage migration.' },
+      { id: 'alpha_centauri', name: 'Alpha Centauri', x: 45, y: 35, z: -10, color: '#FFE4B5', radius: 7, class: 'Class G2V/K1V', subtitle: 'Closest System', dist: '4.37 ly', astrophage: 'MONITORED', desc: 'Nearest stellar neighbor system. High density monitoring active for Petrova activity.' },
+      { id: 'sirius', name: 'Sirius', x: -30, y: 90, z: -50, color: '#FFFFFF', radius: 10, class: 'Class A1V', subtitle: 'Brightest Star', dist: '8.6 ly', astrophage: 'NOMINAL', desc: 'Luminous main sequence star. No Petrova spectrum anomalies detected.' }
+    ];
+
+    const TRAJECTORIES = [
+      { from: 'sol', to: 'tau_ceti', color: 'rgba(197, 179, 88, 0.6)', label: 'Hail Mary Journey' },
+      { from: 'tau_ceti', to: 'eridani', color: 'rgba(0, 229, 255, 0.6)', label: 'Rendezvous & Eridian Transit' },
+      { from: 'eridani', to: 'sol', color: 'rgba(52, 211, 153, 0.6)', label: 'Beetle Probe Return Route' }
+    ];
+
+    let inlineEngine = null;
+    let modalEngine = null;
+    let selectedStar = STAR_DATA[0];
+    let showTrajectories = true;
+
+    class StarMapEngine {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.width = 0;
+        this.height = 0;
+
+        // Camera orbit transform
+        this.zoom = 1.8;
+        this.panX = 0;
+        this.panY = 0;
+        this.rotX = 0.3;
+        this.rotY = 0.4;
+        this.isDragging = false;
+        this.lastMouseX = 0;
+        this.lastMouseY = 0;
+
+        // Smooth camera targets (used for keyboard & focus-star easing)
+        this.targetZoom = this.zoom;
+        this.targetPanX = this.panX;
+        this.targetPanY = this.panY;
+        this.targetRotX = this.rotX;
+        this.targetRotY = this.rotY;
+
+        // Touch state
+        this.touchMode = null; // 'drag' | 'pinch' | null
+        this.lastTouchDist = 0;
+
+        this.hoveredStar = null;
+
+        this.init();
+      }
+
+      init() {
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.bindEvents();
+      }
+
+      resize() {
+        if (!this.canvas) return;
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        this.width = rect.width || 600;
+        this.height = rect.height || 480;
+
+        const dpr = window.devicePixelRatio || 1;
+        this.canvas.width = this.width * dpr;
+        this.canvas.height = this.height * dpr;
+
+        // Critical: reset any previous transform before applying the DPR scale.
+        // Without this, repeated resizes compound the scale and the whole map balloons.
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.scale(dpr, dpr);
+      }
+
+      bindEvents() {
+        // --- Mouse ---
+        this.canvas.addEventListener('mousedown', (e) => {
+          this.isDragging = true;
+          this.lastMouseX = e.clientX;
+          this.lastMouseY = e.clientY;
+        });
+
+        window.addEventListener('mouseup', () => {
+          this.isDragging = false;
+        });
+
+        this.canvas.addEventListener('mousemove', (e) => {
+          const rect = this.canvas.getBoundingClientRect();
+          const mouseX = e.clientX - rect.left;
+          const mouseY = e.clientY - rect.top;
+
+          if (this.isDragging) {
+            const dx = e.clientX - this.lastMouseX;
+            const dy = e.clientY - this.lastMouseY;
+            this.targetRotY += dx * 0.005;
+            this.targetRotX += dy * 0.005;
+            this.lastMouseX = e.clientX;
+            this.lastMouseY = e.clientY;
+          } else {
+            this.checkHover(mouseX, mouseY);
+          }
+        });
+
+        this.canvas.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          this.targetZoom -= e.deltaY * 0.0015;
+          this.targetZoom = Math.max(0.8, Math.min(3.5, this.targetZoom));
+        }, { passive: false });
+
+        this.canvas.addEventListener('click', () => {
+          if (this.hoveredStar) {
+            updateSelectedStar(this.hoveredStar);
+          }
+        });
+
+        // --- Touch (mobile) ---
+        this.canvas.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 1) {
+            this.touchMode = 'drag';
+            this.lastMouseX = e.touches[0].clientX;
+            this.lastMouseY = e.touches[0].clientY;
+          } else if (e.touches.length === 2) {
+            this.touchMode = 'pinch';
+            this.lastTouchDist = this.getTouchDist(e.touches);
+          }
+        }, { passive: true });
+
+        this.canvas.addEventListener('touchmove', (e) => {
+          if (this.touchMode === 'drag' && e.touches.length === 1) {
+            const dx = e.touches[0].clientX - this.lastMouseX;
+            const dy = e.touches[0].clientY - this.lastMouseY;
+            this.targetRotY += dx * 0.005;
+            this.targetRotX += dy * 0.005;
+            this.lastMouseX = e.touches[0].clientX;
+            this.lastMouseY = e.touches[0].clientY;
+            e.preventDefault();
+          } else if (this.touchMode === 'pinch' && e.touches.length === 2) {
+            const dist = this.getTouchDist(e.touches);
+            const delta = (this.lastTouchDist - dist) * 0.01;
+            this.targetZoom += delta;
+            this.targetZoom = Math.max(0.8, Math.min(3.5, this.targetZoom));
+            this.lastTouchDist = dist;
+            e.preventDefault();
+          }
+        }, { passive: false });
+
+        this.canvas.addEventListener('touchend', () => {
+          // Tap-to-select when the gesture ends and a star is under the last touch point
+          if (this.touchMode === 'drag' && this.hoveredStar) {
+            updateSelectedStar(this.hoveredStar);
+          }
+          this.touchMode = null;
+          this.lastTouchDist = 0;
+        });
+      }
+
+      getTouchDist(touches) {
+        const dx = touches[0].clientX - touches[1].clientX;
+        const dy = touches[0].clientY - touches[1].clientY;
+        return Math.hypot(dx, dy);
+      }
+
+      project(x, y, z) {
+        // Rotate around Y
+        const rx = x * Math.cos(this.rotY) - z * Math.sin(this.rotY);
+        let rz = x * Math.sin(this.rotY) + z * Math.cos(this.rotY);
+
+        // Rotate around X
+        const ry = y * Math.cos(this.rotX) - rz * Math.sin(this.rotX);
+        rz = y * Math.sin(this.rotX) + rz * Math.cos(this.rotX);
+
+        // Perspective projection
+        const scale = (400 * this.zoom) / (rz + 400);
+        const px = this.width / 2 + (rx + this.panX) * scale;
+        const py = this.height / 2 + (ry + this.panY) * scale;
+
+        return { x: px, y: py, scale, depth: rz };
+      }
+
+      checkHover(mouseX, mouseY) {
+        let found = null;
+        let bestDist = Infinity;
+
+        STAR_DATA.forEach(star => {
+          const p = this.project(star.x, star.y, star.z);
+          const dist = Math.hypot(p.x - mouseX, p.y - mouseY);
+          const hitRadius = star.radius * p.scale * 1.5;
+
+          // Only consider stars under the cursor, and pick the *closest* one
+          // (previously this was "last one wins", which misbehaved on overlap).
+          if (dist < hitRadius && dist < bestDist) {
+            bestDist = dist;
+            found = star;
+          }
+        });
+
+        this.hoveredStar = found;
+        this.canvas.style.cursor = found ? 'pointer' : (this.isDragging ? 'grabbing' : 'grab');
+      }
+
+      // Easing step - moves current values toward target values each frame
+      ease() {
+        const k = 0.15;
+        this.zoom  += (this.targetZoom  - this.zoom) * k;
+        this.panX  += (this.targetPanX  - this.panX) * k;
+        this.panY  += (this.targetPanY  - this.panY) * k;
+        this.rotX  += (this.targetRotX  - this.rotX) * k;
+        this.rotY  += (this.targetRotY  - this.rotY) * k;
+      }
+
+      render() {
+        this.ease();
+        this.ctx.clearRect(0, 0, this.width, this.height);
+
+        // Draw faint grid lines
+        this.ctx.strokeStyle = 'rgba(197, 179, 88, 0.05)';
+        this.ctx.lineWidth = 1;
+        const gridStep = 40;
+        for (let x = -200; x <= 200; x += gridStep) {
+          const p1 = this.project(x, -100, 0);
+          const p2 = this.project(x, 100, 0);
+          this.ctx.beginPath();
+          this.ctx.moveTo(p1.x, p1.y);
+          this.ctx.lineTo(p2.x, p2.y);
+          this.ctx.stroke();
+        }
+
+        // Trajectory lines
+        if (showTrajectories) {
+          TRAJECTORIES.forEach(traj => {
+            const s1 = STAR_DATA.find(s => s.id === traj.from);
+            const s2 = STAR_DATA.find(s => s.id === traj.to);
+            if (s1 && s2) {
+              const p1 = this.project(s1.x, s1.y, s1.z);
+              const p2 = this.project(s2.x, s2.y, s2.z);
+
+              this.ctx.save();
+              this.ctx.strokeStyle = traj.color;
+              this.ctx.lineWidth = 2;
+              this.ctx.setLineDash([6, 4]);
+              this.ctx.beginPath();
+              this.ctx.moveTo(p1.x, p1.y);
+              this.ctx.lineTo(p2.x, p2.y);
+              this.ctx.stroke();
+              this.ctx.restore();
+            }
+          });
+        }
+
+        // Stars - sorted back to front so nearer stars draw on top
+        STAR_DATA.slice().sort((a, b) =>
+          this.project(b.x, b.y, b.z).depth - this.project(a.x, a.y, a.z).depth
+        ).forEach(star => {
+          const p = this.project(star.x, star.y, star.z);
+          const isSelected = selectedStar && selectedStar.id === star.id;
+          const isHovered = this.hoveredStar && this.hoveredStar.id === star.id;
+
+          // Glowing aura
+          const auraRadius = (star.radius * (isSelected || isHovered ? 3.5 : 2.5)) * p.scale;
+          const gradient = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, auraRadius);
+          gradient.addColorStop(0, star.color);
+          gradient.addColorStop(1, 'transparent');
+
+          this.ctx.fillStyle = gradient;
+          this.ctx.beginPath();
+          this.ctx.arc(p.x, p.y, auraRadius, 0, Math.PI * 2);
+          this.ctx.fill();
+
+          // Core
+          this.ctx.fillStyle = '#FFFFFF';
+          this.ctx.beginPath();
+          this.ctx.arc(p.x, p.y, star.radius * 0.5 * p.scale, 0, Math.PI * 2);
+          this.ctx.fill();
+
+          // Selection ring
+          if (isSelected || isHovered) {
+            this.ctx.strokeStyle = '#C5B358';
+            this.ctx.lineWidth = 1.5;
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, (star.radius + 6) * p.scale, 0, Math.PI * 2);
+            this.ctx.stroke();
+          }
+
+          // Label
+          this.ctx.fillStyle = isSelected ? '#C5B358' : '#CBD5E1';
+          this.ctx.font = `${Math.max(10, 11 * p.scale)}px Orbitron`;
+          this.ctx.fillText(star.name, p.x + (star.radius + 8) * p.scale, p.y + 4);
+        });
+      }
+
+      // Public method: ease the camera toward a target coordinate
+      focusOn(x, y) {
+        this.targetPanX = -x;
+        this.targetPanY = -y;
+      }
+    }
+
+    // Initialize engines on page load
+    window.addEventListener('load', () => {
+      inlineEngine = new StarMapEngine('inlineStarMapCanvas');
+      modalEngine = new StarMapEngine('modalStarMapCanvas');
+
+      function renderLoop() {
+        if (inlineEngine) inlineEngine.render();
+        if (modalEngine && !document.getElementById('starMapModal').classList.contains('hidden')) {
+          modalEngine.render();
+        }
+        requestAnimationFrame(renderLoop);
+      }
+      renderLoop();
+
+      // Global keyboard shortcuts
+      window.addEventListener('keydown', (e) => {
+        // Escape closes modal if open
+        if (e.key === 'Escape') {
+          const modal = document.getElementById('starMapModal');
+          if (!modal.classList.contains('hidden')) {
+            toggleStarMapModal();
+            return;
+          }
+        }
+
+        // Camera controls - apply to the visible engine
+        const modal = document.getElementById('starMapModal');
+        const engine = !modal.classList.contains('hidden') ? modalEngine : inlineEngine;
+        if (!engine) return;
+
+        switch (e.key) {
+          case 'ArrowLeft':  engine.targetRotY -= 0.06; e.preventDefault(); break;
+          case 'ArrowRight': engine.targetRotY += 0.06; e.preventDefault(); break;
+          case 'ArrowUp':    engine.targetRotX -= 0.06; e.preventDefault(); break;
+          case 'ArrowDown':  engine.targetRotX += 0.06; e.preventDefault(); break;
+          case '+':
+          case '=':
+            engine.targetZoom = Math.min(3.5, engine.targetZoom + 0.2);
+            e.preventDefault();
+            break;
+          case '-':
+          case '_':
+            engine.targetZoom = Math.max(0.8, engine.targetZoom - 0.2);
+            e.preventDefault();
+            break;
+        }
+      });
+    });
+
+    /* ===================================================
+       UI CONTROL FUNCTIONS
+       =================================================== */
+    function updateSelectedStar(star) {
+      selectedStar = star;
+      document.getElementById('starName').innerText = star.name;
+      document.getElementById('starSubtitle').innerText = star.subtitle;
+      document.getElementById('starDescription').innerText = star.desc;
+      document.getElementById('starTypeBadge').innerText = star.class;
+      document.getElementById('starDistance').innerText = star.dist;
+      document.getElementById('starAstrophage').innerText = star.astrophage;
+      document.getElementById('hudTargetText').innerText = star.name;
+    }
+
+    function selectStarByName(name) {
+      const star = STAR_DATA.find(s => s.name.toLowerCase() === name.toLowerCase());
+      if (star) {
+        updateSelectedStar(star);
+        focusSelectedStar();
+      }
+    }
+
+    function focusSelectedStar() {
+      if (!selectedStar) return;
+      if (inlineEngine) inlineEngine.focusOn(selectedStar.x, selectedStar.y);
+      if (modalEngine)  modalEngine.focusOn(selectedStar.x, selectedStar.y);
+    }
+
+    function resetMapCamera() {
+      [inlineEngine, modalEngine].forEach(eng => {
+        if (eng) {
+          eng.targetZoom = 1.8;
+          eng.targetPanX = 0;
+          eng.targetPanY = 0;
+          eng.targetRotX = 0.3;
+          eng.targetRotY = 0.4;
+        }
+      });
+    }
+
+    function toggleTrajectories() {
+      showTrajectories = !showTrajectories;
+    }
+
+    function toggleStarMapModal() {
+      const modal = document.getElementById('starMapModal');
+      modal.classList.toggle('hidden');
+      modal.classList.toggle('flex');
+      if (modalEngine && !modal.classList.contains('hidden')) {
+        setTimeout(() => modalEngine.resize(), 50);
+      }
+    }
+
+    // Click outside modal content closes it
+    document.getElementById('starMapModal').addEventListener('click', (e) => {
+      // Only close if the click is on the modal backdrop itself, not on any child
+      if (e.target === e.currentTarget) {
+        toggleStarMapModal();
+      }
+    });
+  </script>
+</body>
+</html>
